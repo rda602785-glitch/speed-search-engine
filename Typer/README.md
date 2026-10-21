@@ -1,75 +1,47 @@
-# React + TypeScript + Vite
+# ⚡ SpeedTyper & Search (React Performance Benchmark)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A high-performance React + TypeScript application engineered to demonstrate **zero-lag rendering**, memory stability, and efficient computation handling with high-frequency state updates and a 4,000+ item in-memory dataset.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🎯 The Performance Problem
+In standard React applications:
+1. **High-Frequency Ticks:** Running a 1-second interval timer triggers frequent component-wide re-renders.
+2. **Expensive Computations:** Heavy calculations (filtering an array of 4,000 objects) re-run on every unrelated tick, causing UI stutter and frame drops.
+3. **Broken Referential Equality:** Callback functions recreate on every render, invalidating child memoization.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠️ Architectural Solutions
 
-## Expanding the ESLint configuration
+- **`useRef` for Lifecycle & Direct DOM Access:**
+  - Manages automatic input focus without extra renders.
+  - Safely stores and cleans up the active timer ID (`timerIdRef`), completely preventing memory leaks.
+- **`useMemo` for In-Memory Data Caching:**
+  - Isolates and caches the 4,000-word search filter.
+  - Unrelated timer ticks **do not** re-trigger array filtering operations.
+- **`useCallback` + `React.memo` for Pure Components:**
+  - Locks function references (`handleReset`) across render passes.
+  - Completely eliminates ghost re-renders in the `ActionButton` component.
+- **DOM Rendering Optimization:**
+  - Implements lightweight UI virtualization using `.slice(0, 20)` to maintain high FPS and low DOM node count.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🚀 Tech Stack
+- **Framework:** React 18 / 19
+- **Language:** TypeScript (Strict typing for Props, Ref, and Data structures)
+- **Tooling:** Vite
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 💻 How to Run Locally
+```bash
+# 1. Clone repository
+git clone https://github.com/rda602785-glitch/speed-search-engine.git
 
-```
+# 2. Install dependencies
+npm install
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+# 3. Launch development server
+npm run dev
